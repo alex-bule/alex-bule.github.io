@@ -224,34 +224,64 @@
             `).join('');
         }
 
+        // Show a specific section
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(function(section) {
+                section.style.display = 'none';
+                section.classList.remove('active');
+            });
+
+            // Show target section
+            var target = document.getElementById(sectionId);
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(function(navLink) {
+                navLink.classList.remove('active');
+                if (navLink.getAttribute('data-section') === sectionId) {
+                    navLink.classList.add('active');
+                }
+            });
+
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
         // Navigation functionality
         function initNavigation() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.section');
+            var navLinks = document.querySelectorAll('.nav-link');
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
+            navLinks.forEach(function(link) {
+                // Handle both click and touch
+                function handleNav(e) {
                     e.preventDefault();
-                    const targetId = link.getAttribute('data-section');
+                    e.stopPropagation();
+                    var targetId = link.getAttribute('data-section');
+                    showSection(targetId);
+                    return false;
+                }
 
-                    // Update active states
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-
-                    sections.forEach(s => s.classList.remove('active'));
-                    document.getElementById(targetId).classList.add('active');
-
-                    // Scroll to top of main content
-                    document.querySelector('.main-content').scrollTop = 0;
-                });
+                link.addEventListener('click', handleNav, false);
+                link.addEventListener('touchend', handleNav, false);
             });
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                renderProjects();
+                initNavigation();
+                showSection('about');
+            });
+        } else {
             renderProjects();
             initNavigation();
-        });
+            showSection('about');
+        }
     </script>
 </body>
 </html>
